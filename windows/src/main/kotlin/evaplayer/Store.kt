@@ -69,12 +69,12 @@ class AppSettings {
         }
     }
 
-    fun setTheme(v: String) { theme = v; Store.put("theme", v) }
-    fun setAccent(v: String) { accent = v; Store.put("accent", v) }
+    fun changeTheme(v: String) { theme = v; Store.put("theme", v) }
+    fun changeAccent(v: String) { accent = v; Store.put("accent", v) }
     fun setSkip(v: Int) { skipSeconds = v; Store.put("skip", v.toString()) }
-    fun setResume(v: Boolean) { resume = v; Store.put("resume", if (v) "1" else "0") }
-    fun setAutoNext(v: Boolean) { autoNext = v; Store.put("autonext", if (v) "1" else "0") }
-    fun setVolume(v: Int) { volume = v; Store.put("volume", v.toString()) }
+    fun changeResume(v: Boolean) { resume = v; Store.put("resume", if (v) "1" else "0") }
+    fun changeAutoNext(v: Boolean) { autoNext = v; Store.put("autonext", if (v) "1" else "0") }
+    fun changeVolume(v: Int) { volume = v; Store.put("volume", v.toString()) }
 
     fun addFolder(path: String) {
         if (folders.none { it.equals(path, ignoreCase = true) }) {
