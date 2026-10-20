@@ -492,7 +492,7 @@ fun SettingsTab(app: AppController) {
             Section("Appearance") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("Dark", "Light", "AMOLED").forEach { t ->
-                        FilterChip(selected = s.theme == t, onClick = { s.setTheme(t) }, label = { Text(t) })
+                        FilterChip(selected = s.theme == t, onClick = { s.changeTheme(t) }, label = { Text(t) })
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -500,7 +500,7 @@ fun SettingsTab(app: AppController) {
                     AccentOptions.forEach { (name, color) ->
                         Box(
                             Modifier.size(34.dp).clip(CircleShape).background(color)
-                                .clickable { s.setAccent(name) },
+                                .clickable { s.changeAccent(name) },
                             contentAlignment = Alignment.Center,
                         ) {
                             if (s.accent == name) {
@@ -516,8 +516,8 @@ fun SettingsTab(app: AppController) {
         }
         item {
             Section("Playback") {
-                ToggleRow("Resume where you left off", s.resume) { s.setResume(it) }
-                ToggleRow("Play next item automatically", s.autoNext) { s.setAutoNext(it) }
+                ToggleRow("Resume where you left off", s.resume) { s.changeResume(it) }
+                ToggleRow("Play next item automatically", s.autoNext) { s.changeAutoNext(it) }
                 Spacer(Modifier.height(8.dp))
                 Text("Skip step (arrow keys / buttons)", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(6.dp))
