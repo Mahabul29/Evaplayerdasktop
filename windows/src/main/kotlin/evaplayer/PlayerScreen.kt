@@ -275,7 +275,7 @@ private fun SpeedMenu(e: Engine) {
                         val label = String.format(Locale.US, "%.2fx", s)
                         Text(if (e.rate == s) "✓  $label" else label)
                     },
-                    onClick = { e.setRate(s); open = false },
+                    onClick = { e.changeRate(s); open = false },
                 )
             }
         }
