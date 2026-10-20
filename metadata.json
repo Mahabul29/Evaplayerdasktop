@@ -1,0 +1,6 @@
+{
+  "name": "EvaPlayer for Windows",
+  "description": "Desktop media player for Windows featuring Fluent Design, local video and music library, subtitle engine, network streaming, audio equalizer, and Windows release packaging.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

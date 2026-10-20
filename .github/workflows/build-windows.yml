@@ -1,0 +1,87 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'windows/**'
+      - '.github/workflows/build-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.10.2
+
+      # Ship VLC inside the app so users don't have to install anything.
+      # If this step fails the app still builds and falls back to an installed VLC.
+      - name: Bundle VLC
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $ver = "3.0.21"
+          Invoke-WebRequest "https://get.videolan.org/vlc/$ver/win64/vlc-$ver-win64.zip" -OutFile vlc.zip
+          Expand-Archive vlc.zip -DestinationPath vlc_tmp -Force
+          $src = "vlc_tmp/vlc-$ver"
+          $dst = "windows/app-resources/common/vlc"
+          New-Item -ItemType Directory -Force $dst | Out-Null
+          Copy-Item "$src/libvlc.dll", "$src/libvlccore.dll" $dst
+          Copy-Item "$src/plugins" "$dst/plugins" -Recurse
+          Get-ChildItem $dst | Select-Object -First 10
+
+      - name: Build app (portable folder)
+        shell: bash
+        run: |
+          gradle -p windows createDistributable --console=plain > build.log 2>&1 || {
+            echo "BUILD FAILED. Kotlin errors:"
+            grep -E "^e: " build.log | sed "s#file:///[^ ]*/windows/##" | sed 's/^/::error::/'
+            echo "---- Last 60 lines of the log ----"
+            tail -n 60 build.log
+            exit 1
+          }
+
+      - name: Zip portable build
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "windows/build/compose/binaries/main/app/EvaPlayer" -DestinationPath EvaPlayer-Windows-portable.zip
+
+      - name: Build installer (.msi)
+        shell: bash
+        continue-on-error: true
+        run: |
+          gradle -p windows packageMsi --console=plain
+          cp windows/build/compose/binaries/main/msi/*.msi EvaPlayer-Windows-setup.msi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: EvaPlayer-Windows
+          path: |
+            EvaPlayer-Windows-portable.zip
+            EvaPlayer-Windows-setup.msi
+          if-no-files-found: warn
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: windows-v${{ github.run_number }}
+          name: EvaPlayer for Windows v${{ github.run_number }}
+          files: |
+            EvaPlayer-Windows-portable.zip
+            EvaPlayer-Windows-setup.msi
