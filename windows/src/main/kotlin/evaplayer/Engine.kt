@@ -198,7 +198,7 @@ class Engine(private val settings: AppSettings, private val memory: MediaMemory)
     fun setVolumePercent(v: Int) {
         volume = v.coerceIn(0, 200)
         player?.audio()?.setVolume(volume)
-        settings.setVolume(volume)
+        settings.changeVolume(volume)
         if (muted && volume > 0) toggleMute()
     }
 
@@ -207,7 +207,7 @@ class Engine(private val settings: AppSettings, private val memory: MediaMemory)
         player?.audio()?.setMute(muted)
     }
 
-    fun setRate(r: Float) {
+    fun changeRate(r: Float) {
         rate = r
         player?.controls()?.setRate(r)
     }
